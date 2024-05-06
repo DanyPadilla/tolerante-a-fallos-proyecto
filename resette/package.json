@@ -1,0 +1,13 @@
+{
+    "name": "game-resette",
+    "version": "1.0.0",
+    "description": "Microservicio para reiniciar el juego de adivinanza",
+    "main": "gameResette.js",
+    "scripts": {
+        "start": "node gameResette.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.17.1"
+    }
+}

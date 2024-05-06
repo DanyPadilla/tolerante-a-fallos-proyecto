@@ -1,0 +1,14 @@
+{
+    "name": "guess",
+    "version": "1.0.0",
+    "description": "Microservicio para manejar conjeturas de adivinanza",
+    "main": "guess.js",
+    "scripts": {
+        "start": "node guess.js"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "express": "^4.17.1"
+    }
+}
