@@ -1,5 +1,5 @@
 Interfaz basica:
-images/interfaz basica.PNG
+[images/interfaz basica.PNG](https://github.com/DanyPadilla/tolerante-a-fallos-proyecto/blob/master/images/interfaz%20basica.PNG?raw=true)
 
 Descargar microservicios:
 
