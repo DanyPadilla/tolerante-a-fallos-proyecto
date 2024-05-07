@@ -1,3 +1,6 @@
+Interfaz basica:
+images/interfaz basica.PNG
+
 Descargar microservicios:
 
 `docker pull dany2831/reiniciador-juego`
