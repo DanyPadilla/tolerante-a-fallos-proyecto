@@ -9,3 +9,19 @@ Descargar microservicios:
 
 `docker pull dany2831/manejador-conjeturas`
 
+docker build -t dany2831/random-number-service:latest -f Dockerfile .
+docker build -t dany2831/guess-service:latest -f Dockerfile .
+docker build -t dany2831/game-reset-service:latest -f Dockerfile .
+
+docker push dany2831/random-number-service:latest
+docker push dany2831/guess-service:latest
+docker push dany2831/game-reset-service:latest
+
+kubectl apply -f random-number-service-deployment.yaml
+kubectl apply -f guess-service-deployment.yaml
+kubectl apply -f game-reset-service-deployment.yaml
+
+
+kubectl get pods
+kubectl get services
+

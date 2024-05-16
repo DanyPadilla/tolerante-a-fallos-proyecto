@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>Adivinanza</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
         }
+
         h1 {
             margin-top: 50px;
         }
+
         #resultado {
             margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
     <h1>¡Adivina el número!</h1>
     <form id="formulario">
@@ -36,93 +41,96 @@
         const intentosDiv = document.getElementById('intentos');
 
         let intentosRestantes = 5;
+        let numeroSecreto;
 
         // Función para actualizar el mensaje de intentos
         const actualizarIntentos = () => {
             intentosDiv.innerText = `Intentos restantes: ${intentosRestantes}`;
         };
 
-        const obtenerNuevoNumero = async () => {
+        // Función para obtener un nuevo número aleatorio del microservicio de números aleatorios
+        const obtenerNuevoNumeroAleatorio = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/generar-numero-aleatorio');
+                return response.data.numero;
+            } catch (error) {
+                console.error('Error al obtener el número aleatorio:', error);
+                throw error; // Propagar el error para manejarlo en el código que llama a esta función
+            }
+        };
+
+        // Función para iniciar el juego
+        const iniciarJuego = async () => {
             intentosRestantes = 5;
             actualizarIntentos();
             formulario.reset(); // Reiniciar el formulario
             botonAdivinar.disabled = false; // Habilitar el botón de adivinar
-        
-            try {
-                const response = await fetch('http://localhost:3001/generar-numero-aleatorio');
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(data.numero);
-                    if (data.numero) {
-                        resultado.innerText = `Se generó el número ${data.numero}`;
 
-                    } else {
-                        resultado.innerText = 'Error al generar el nuevo número.';
+            try {
+                const response = await axios.post('http://localhost:3002/iniciar-adivinanza');
+                const data = response.data;
+                if (response.status === 200) {
+                    console.log(data.mensaje);
+                    if (data.mensaje === 'El juego ha sido iniciado.') {
+                        numeroSecreto = await obtenerNuevoNumeroAleatorio();
+                        resultado.innerText = `Se generó el número ${numeroSecreto}`;
                     }
                 } else {
-                    resultado.innerText = 'Error en la respuesta del servidor.';
+                    console.error('Error al iniciar el juego:', data.error);
+                    resultado.innerText = 'Error al conectar con el servidor.';
                 }
             } catch (error) {
-                console.error('Error al obtener el número aleatorio:', error);
+                console.error('Error al iniciar el juego:', error);
                 resultado.innerText = 'Error al conectar con el servidor.';
             }
         };
-        
-        
 
-        // Envía una solicitud GET al iniciar la página para obtener el primer número
-        obtenerNuevoNumero();
-
-        formulario.addEventListener('submit', async (event) => {
+        // Función para manejar la conjetura del usuario
+        const manejarConjetura = async (event) => {
             event.preventDefault();
-            const conjetura = parseInt(document.getElementById('conjetura').value);
-            const response = await fetch('http://localhost:3002/iniciar-adivinanza', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ conjetura })
-            });
-            const data = await response.json();
-            if (data.mensaje) {
-                resultado.innerText = data.mensaje;
-            } else {
-                resultado.innerText = 'Error al procesar la conjetura.';
+            if (!numeroSecreto) {
+                console.log('El juego no ha sido iniciado.');
+                resultado.innerText = 'El juego no ha sido iniciado.'; // Mostrar mensaje en la interfaz
+                return;
             }
-            if (data.mensaje.includes('Incorrecto')) {
-                intentosRestantes--;
-                actualizarIntentos();
-                if (intentosRestantes === 0) {
-                    botonAdivinar.disabled = true; // Deshabilitar el botón de adivinar
-                    resultado.innerText += ' Se han agotado tus intentos.';
-                }
-            }
-        });
 
-        nuevoNumeroButton.addEventListener('click', async () => {
+            const conjetura = parseInt(document.getElementById('conjetura').value);
             try {
-                const response = await fetch('http://localhost:3003/reiniciar-juego', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({}) // Si necesitas enviar datos en el cuerpo de la solicitud, ponlos aquí
+                const response = await axios.post('http://localhost:3002/adivinar', {
+                    conjetura: conjetura // Asegurarse de enviar como objeto con la clave correcta
                 });
-                // Hacer una solicitud GET al nuevo endpoint
-                const data = await response.json();
-                if (data.nuevoNumero) {
-                    // Actualizar la interfaz de usuario con el nuevo número generado
-                    document.getElementById('resultado').innerText = data.mensaje;
-                    document.getElementById('conjetura').value = ''; // Limpiar el campo de conjetura
+                const data = response.data;
+                if (response.status === 200) {
+                    resultado.innerText = data.mensaje;
+                    if (data.mensaje.includes('Incorrecto')) {
+                        intentosRestantes--;
+                        actualizarIntentos();
+                        if (intentosRestantes === 0) {
+                            botonAdivinar.disabled = true; // Deshabilitar el botón de adivinar
+                            resultado.innerText += ' Se han agotado tus intentos.';
+                        }
+                    }
                 } else {
-                    console.error('Error al reiniciar el juego:', data.error);
+                    resultado.innerText = data.error; // Mostrar el mensaje de error del servidor
                 }
             } catch (error) {
-                console.error('Error al reiniciar el juego:', error);
+                console.error('Error al enviar la conjetura:', error);
+                if (error.response && error.response.data && error.response.data.error) {
+                    resultado.innerText = error.response.data.error;
+                } else {
+                    resultado.innerText = 'Error al conectar con el servidor.';
+                }
             }
-        });
-        
+        };
+
+        // Iniciar el juego al cargar la página
+        window.onload = iniciarJuego;
+
+        formulario.addEventListener('submit', manejarConjetura);
+
+        nuevoNumeroButton.addEventListener('click', iniciarJuego);
 
     </script>
 </body>
+
 </html>

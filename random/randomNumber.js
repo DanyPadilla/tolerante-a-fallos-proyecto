@@ -1,19 +1,35 @@
 const express = require('express');
 const cors = require('cors');
+const amqp = require('amqplib');
 
 const app = express();
-
-// Habilitar CORS
 app.use(cors());
 
-// Generar un número aleatorio entre 1 y 100
 const generarNumeroAleatorio = () => {
     return Math.floor(Math.random() * 100) + 1;
 };
 
-// Endpoint para generar un nuevo número aleatorio
-app.get('/generar-numero-aleatorio', (req, res) => {
+app.get('/generar-numero-aleatorio', async (req, res) => {
     const numeroAleatorio = generarNumeroAleatorio();
+
+    try {
+        const connection = await amqp.connect('amqp://rabbitmq');
+        const channel = await connection.createChannel();
+        const queue = 'numeros_aleatorios';
+
+        await channel.assertQueue(queue, { durable: true });
+        await channel.sendToQueue(queue, Buffer.from(numeroAleatorio.toString()));
+
+        console.log(`Número aleatorio ${numeroAleatorio} enviado a la cola.`);
+        
+        await channel.close();
+        await connection.close();
+    } catch (error) {
+        console.error('Error al enviar el número aleatorio a RabbitMQ:', error);
+        res.status(500).json({ error: 'Error al generar el número aleatorio.' });
+        return;
+    }
+
     res.json({ numero: numeroAleatorio });
 });
 
