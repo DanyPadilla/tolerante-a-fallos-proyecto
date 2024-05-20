@@ -17,11 +17,40 @@ docker push dany2831/random-number-service:latest
 docker push dany2831/guess-service:latest
 docker push dany2831/game-reset-service:latest
 
-kubectl apply -f random-number-service-deployment.yaml
-kubectl apply -f guess-service-deployment.yaml
-kubectl apply -f game-reset-service-deployment.yaml
-
+docker build -t random-number-service .
+docker build -t guess-service .
+docker build -t reset-service .
 
 kubectl get pods
 kubectl get services
 
+docker network inspect my_network
+
+Reiniciar los Contenedores
+Si realizaste cambios en los contenedores, asegúrate de reiniciarlos:
+docker-compose down
+docker-compose up -d
+
+
+docker stop random-number-service guess-service reset-service
+docker rm random-number-service guess-service reset-service
+
+docker run -d --name random-number-service --network adivinanza-network -p 3001:3001 random-number-service
+docker run -d --name guess-service --network adivinanza-network --link rabbitmq -p 3002:3002 guess-service
+docker run -d --name reset-service --network adivinanza-network --link random-number-service -p 3003:3003 reset-service
+
+***iniciar***
+
+minikube start
+
+kubectl apply -f guess/guess.yaml
+kubectl apply -f random/randomNumber.yaml
+kubectl apply -f resette/gameResette.yaml
+kubectl apply -f rabbitmq.yaml
+
+kubectl get pods
+kubectl get svc
+
+minikube service guess-service --url
+minikube service random-number-service --url
+minikube service game-reset-service --url

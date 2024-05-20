@@ -43,61 +43,56 @@
         let intentosRestantes = 5;
         let numeroSecreto;
 
-        // Función para actualizar el mensaje de intentos
         const actualizarIntentos = () => {
             intentosDiv.innerText = `Intentos restantes: ${intentosRestantes}`;
         };
 
-        // Función para obtener un nuevo número aleatorio del microservicio de números aleatorios
         const obtenerNuevoNumeroAleatorio = async () => {
             try {
-                const response = await axios.get('http://localhost:3001/generar-numero-aleatorio');
+                const response = await axios.get('http://random-number-service/generar-numero-aleatorio');
                 return response.data.numero;
             } catch (error) {
                 console.error('Error al obtener el número aleatorio:', error);
-                throw error; // Propagar el error para manejarlo en el código que llama a esta función
+                throw error;
             }
         };
 
-        // Función para iniciar el juego
         const iniciarJuego = async () => {
             intentosRestantes = 5;
             actualizarIntentos();
-            formulario.reset(); // Reiniciar el formulario
-            botonAdivinar.disabled = false; // Habilitar el botón de adivinar
+            formulario.reset();
+            botonAdivinar.disabled = false;
 
             try {
-                const response = await axios.post('http://localhost:3002/iniciar-adivinanza');
+                const response = await axios.post('http://guessing-game-service/iniciar-adivinanza');
                 const data = response.data;
                 if (response.status === 200) {
-                    console.log(data.mensaje);
                     if (data.mensaje === 'El juego ha sido iniciado.') {
                         numeroSecreto = await obtenerNuevoNumeroAleatorio();
                         resultado.innerText = `Se generó el número ${numeroSecreto}`;
                     }
                 } else {
                     console.error('Error al iniciar el juego:', data.error);
-                    resultado.innerText = 'Error al conectar con el servidor.';
+                    resultado.innerText = 'Error al conectar con el servidor a.';
                 }
             } catch (error) {
                 console.error('Error al iniciar el juego:', error);
-                resultado.innerText = 'Error al conectar con el servidor.';
+                resultado.innerText = 'Error al conectar con el servidor b.';
             }
         };
 
-        // Función para manejar la conjetura del usuario
         const manejarConjetura = async (event) => {
             event.preventDefault();
             if (!numeroSecreto) {
                 console.log('El juego no ha sido iniciado.');
-                resultado.innerText = 'El juego no ha sido iniciado.'; // Mostrar mensaje en la interfaz
+                resultado.innerText = 'El juego no ha sido iniciado.';
                 return;
             }
 
             const conjetura = parseInt(document.getElementById('conjetura').value);
             try {
-                const response = await axios.post('http://localhost:3002/adivinar', {
-                    conjetura: conjetura // Asegurarse de enviar como objeto con la clave correcta
+                const response = await axios.post('http://guessing-game-service/adivinar', {
+                    conjetura: conjetura
                 });
                 const data = response.data;
                 if (response.status === 200) {
@@ -106,12 +101,12 @@
                         intentosRestantes--;
                         actualizarIntentos();
                         if (intentosRestantes === 0) {
-                            botonAdivinar.disabled = true; // Deshabilitar el botón de adivinar
+                            botonAdivinar.disabled = true;
                             resultado.innerText += ' Se han agotado tus intentos.';
                         }
                     }
                 } else {
-                    resultado.innerText = data.error; // Mostrar el mensaje de error del servidor
+                    resultado.innerText = data.error;
                 }
             } catch (error) {
                 console.error('Error al enviar la conjetura:', error);
@@ -123,7 +118,6 @@
             }
         };
 
-        // Iniciar el juego al cargar la página
         window.onload = iniciarJuego;
 
         formulario.addEventListener('submit', manejarConjetura);
