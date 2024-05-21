@@ -5,28 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <title>Adivinanza</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        h1 {
-            margin-top: 50px;
-        }
-
-        #resultado {
-            margin-top: 20px;
-        }
-    </style>
 </head>
 
 <body>
     <h1>¡Adivina el número!</h1>
     <form id="formulario">
-        <label for="conjetura">Ingresa tu conjetura (entre 1 y 100):</label><br>
-        <input type="number" id="conjetura" name="conjetura" min="1" max="100" required><br>
+        <label for="conjetura">Ingresa tu conjetura (entre 1 y 100):</label>
+        <input type="number" id="conjetura" name="conjetura" min="1" max="100" required>
         <button type="submit" id="botonAdivinar">Adivinar</button>
     </form>
     <button id="nuevoNumero">Generar nuevo número</button>
@@ -73,11 +61,11 @@
                     }
                 } else {
                     console.error('Error al iniciar el juego:', data.error);
-                    resultado.innerText = 'Error al conectar con el servidor a.';
+                    resultado.innerText = 'Error al conectar con el servidor.';
                 }
             } catch (error) {
                 console.error('Error al iniciar el juego:', error);
-                resultado.innerText = 'Error al conectar con el servidor b.';
+                resultado.innerText = 'Error al conectar con el servidor.';
             }
         };
 
@@ -121,9 +109,7 @@
         window.onload = iniciarJuego;
 
         formulario.addEventListener('submit', manejarConjetura);
-
         nuevoNumeroButton.addEventListener('click', iniciarJuego);
-
     </script>
 </body>
 

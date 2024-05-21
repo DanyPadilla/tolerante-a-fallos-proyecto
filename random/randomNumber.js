@@ -20,7 +20,7 @@ app.get('/generar-numero-aleatorio', async (req, res) => {
         await channel.assertQueue(queue, { durable: true });
         await channel.sendToQueue(queue, Buffer.from(numeroAleatorio.toString()));
 
-        console.log(`Número aleatorio ${numeroAleatorio} enviado a la cola.`);
+        console.log(`Número aleatorio ${numeroAleatorio} enviado a la cola`);
         
         await channel.close();
         await connection.close();

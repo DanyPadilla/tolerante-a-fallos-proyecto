@@ -9,7 +9,6 @@ app.use(cors());
 
 let numeroSecreto;
 
-// Función para recibir el número aleatorio de RabbitMQ
 async function recibirNumeroAleatorio() {
     try {
         const connection = await amqp.connect('amqp://rabbitmq');

@@ -1,0 +1,76 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 2.5rem;
+    color: #3c096c;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    width: 300px;
+    text-align: center;
+}
+
+#nuevoNumero {
+    background-color: #3c096c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    width: 300px;
+    text-align: center;
+    cursor: pointer;
+    color: white;
+}
+
+label {
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: block;
+    color: #333;
+}
+
+input[type="number"] {
+    width: calc(100% - 22px); 
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #c5c077;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+button {
+    background-color: #3c096c;
+    color: rgb(211, 204, 147);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px; 
+}
+
+button:hover {
+    background-color: #3c096c;
+}
+
+#resultado, #intentos {
+    margin-top: 20px;
+    font-size: 1.2rem;
+}

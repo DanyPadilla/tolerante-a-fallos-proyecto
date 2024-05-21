@@ -1,56 +1,109 @@
-Interfaz basica:
-![interfaz basica](https://github.com/DanyPadilla/tolerante-a-fallos-proyecto/assets/115854723/2dd64e66-2fca-40b6-80d8-03ec66328248)
+# Proyecto de Adivinanza con Kubernetes y RabbitMQ
 
-Descargar microservicios:
+Este proyecto implementa un juego de adivinanza de números que utiliza Kubernetes para la orquestación de contenedores y RabbitMQ como sistema de mensajería.
 
-`docker pull dany2831/reiniciador-juego`
+## Tabla de Contenidos
 
-`docker pull dany2831/generador-numeros-aleatorios`
+- [Descripción](#descripción)
+- [Arquitectura](#arquitectura)
+- [Requisitos Previos](#requisitos-previos)
+- [Configuración del Proyecto](#configuración-del-proyecto)
+- [Despliegue en Kubernetes](#despliegue-en-kubernetes)
+- [Uso](#uso)
+- [Contribuciones](#contribuciones)
+- [Licencia](#licencia)
 
-`docker pull dany2831/manejador-conjeturas`
+## Descripción
 
-docker build -t dany2831/random-number-service:latest -f Dockerfile .
-docker build -t dany2831/guess-service:latest -f Dockerfile .
-docker build -t dany2831/game-reset-service:latest -f Dockerfile .
+Este proyecto es una implementación de un juego de adivinanza de números. Los usuarios pueden intentar adivinar un número generado aleatoriamente entre 1 y 100. El backend de la aplicación está dividido en microservicios desplegados en un clúster de Kubernetes, y utiliza RabbitMQ para la comunicación entre servicios.
 
-docker push dany2831/random-number-service:latest
-docker push dany2831/guess-service:latest
-docker push dany2831/game-reset-service:latest
+## Arquitectura
 
-docker build -t random-number-service .
-docker build -t guess-service .
-docker build -t reset-service .
+La aplicación está dividida en varios componentes:
 
-kubectl get pods
-kubectl get services
+1. **Frontend**: Interfaz de usuario que permite a los usuarios ingresar sus conjeturas.
+2. **Backend**: Servicio que maneja las conjeturas y proporciona la lógica del juego.
+3. **RabbitMQ**: Sistema de mensajería utilizado para la comunicación entre servicios.
+4. **Microservicio de Generación de Números Aleatorios**: Genera números aleatorios y los proporciona al backend.
 
-docker network inspect my_network
+## Imagen del Sistema
 
-Reiniciar los Contenedores
-Si realizaste cambios en los contenedores, asegúrate de reiniciarlos:
-docker-compose down
-docker-compose up -d
+![Imagen del Sistema](images/adivinanza.png)
 
+## Requisitos Previos
 
-docker stop random-number-service guess-service reset-service
-docker rm random-number-service guess-service reset-service
+- [Docker](https://www.docker.com/)
+- [Kubernetes](https://kubernetes.io/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [Minikube](https://minikube.sigs.k8s.io/docs/) (opcional para pruebas locales)
+- [RabbitMQ](https://www.rabbitmq.com/)
 
-docker run -d --name random-number-service --network adivinanza-network -p 3001:3001 random-number-service
-docker run -d --name guess-service --network adivinanza-network --link rabbitmq -p 3002:3002 guess-service
-docker run -d --name reset-service --network adivinanza-network --link random-number-service -p 3003:3003 reset-service
+## Configuración del Proyecto
 
-***iniciar***
+1. Clona el repositorio:
 
-minikube start
+    ```bash
+    git clone https://github.com/tu-usuario/tu-repositorio.git
+    cd tu-repositorio
+    ```
 
-kubectl apply -f guess/guess.yaml
-kubectl apply -f random/randomNumber.yaml
-kubectl apply -f resette/gameResette.yaml
-kubectl apply -f rabbitmq.yaml
+2. Construye las imágenes Docker:
 
-kubectl get pods
-kubectl get svc
+    ```bash
+    docker build -t adivinanza-frontend ./frontend
+    docker build -t adivinanza-backend ./backend
+    docker build -t randomnumber-service ./randomnumber
+    ```
 
-minikube service guess-service --url
-minikube service random-number-service --url
-minikube service game-reset-service --url
+3. Empuja las imágenes a tu registro de Docker (opcional):
+
+    ```bash
+    docker tag adivinanza-frontend tu-usuario/adivinanza-frontend
+    docker push tu-usuario/adivinanza-frontend
+    
+    docker tag adivinanza-backend tu-usuario/adivinanza-backend
+    docker push tu-usuario/adivinanza-backend
+    
+    docker tag randomnumber-service tu-usuario/randomnumber-service
+    docker push tu-usuario/randomnumber-service
+    ```
+
+## Despliegue en Kubernetes
+
+1. Aplica los despliegues y servicios de Kubernetes:
+
+    ```bash
+    kubectl apply -f kubernetes/rabbitmq-deployment.yaml
+    kubectl apply -f kubernetes/rabbitmq-service.yaml
+    kubectl apply -f kubernetes/guessing-game-deployment.yaml
+    kubectl apply -f kubernetes/guessing-game-service.yaml
+    kubectl apply -f kubernetes/randomnumber-deployment.yaml
+    kubectl apply -f kubernetes/randomnumber-service.yaml
+    ```
+
+2. Verifica que los pods estén corriendo:
+
+    ```bash
+    kubectl get pods
+    kubectl get services
+    ```
+
+## Uso
+
+1. Accede a la aplicación frontend desde tu navegador. Si estás usando Minikube, puedes obtener la URL con:
+
+    ```bash
+    minikube service guessing-game-service
+    ```
+
+2. Ingresa tus conjeturas y juega el juego de adivinanza.
+
+## Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, sigue los siguientes pasos:
+
+1. Haz un fork del repositorio.
+2. Crea una nueva rama (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza tus cambios y haz commit de los mismos (`git commit -am 'Agrega nueva funcionalidad'`).
+4. Haz push de la rama (`git push origin feature/nueva-funcionalidad`).
+5. Abre un Pull Request.
